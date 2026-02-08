@@ -108,6 +108,18 @@ function formatThread(data: any): string {
   return lines.join("\n");
 }
 
+function formatCounts(data: any): string {
+  const counts: any[] = data.counts ?? [];
+  if (!counts.length) return "(no data)";
+  const total = data.meta?.totalTweetCount;
+  const lines = counts.map((c: any) => {
+    const time = c.start ? new Date(c.start).toISOString().slice(0, 16).replace("T", " ") : "";
+    return `${padEnd(time, 16)}  ${padStart(String(c.tweetCount ?? 0), 8)}`;
+  });
+  if (total != null) lines.push(`Total: ${total}`);
+  return lines.join("\n");
+}
+
 function formatSimpleAction(verb: string, data: any): string {
   const id = data.id || "";
   return `${verb}: ${id}`;
@@ -153,8 +165,13 @@ const formatters: Record<string, (data: any) => string> = {
   mentions: formatPostList,
   liked: formatPostList,
   bookmarks: formatPostList,
+  "search-all": formatPostList,
+  counts: formatCounts,
+  "counts-all": formatCounts,
   "liking-users": formatUserList,
   "reposted-by": formatUserList,
+  "hide-reply": (d) => `Hidden: ${d.id}`,
+  "unhide-reply": (d) => `Unhidden: ${d.id}`,
   user: formatUserProfile,
   followers: formatUserList,
   following: formatUserList,

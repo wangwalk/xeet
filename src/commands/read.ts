@@ -109,4 +109,30 @@ export function registerReadCommand(program: Command): void {
         fail(err);
       }
     });
+
+  program
+    .command("hide-reply <id>")
+    .description("Hide a reply to your post")
+    .action(async (id: string) => {
+      try {
+        const client = await getClient();
+        const res = await client.posts.hideReply(id, { body: { hidden: true } });
+        success({ hidden: res.data?.hidden ?? true, id });
+      } catch (err) {
+        fail(err);
+      }
+    });
+
+  program
+    .command("unhide-reply <id>")
+    .description("Unhide a reply to your post")
+    .action(async (id: string) => {
+      try {
+        const client = await getClient();
+        const res = await client.posts.hideReply(id, { body: { hidden: false } });
+        success({ hidden: res.data?.hidden ?? false, id });
+      } catch (err) {
+        fail(err);
+      }
+    });
 }
