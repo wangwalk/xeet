@@ -1,4 +1,5 @@
 import { XeetError, ErrorCode, ExitCode, toXeetError } from "./utils/errors.js";
+import { formatHuman } from "./format.js";
 
 export interface SuccessResult<T = unknown> {
   ok: true;
@@ -16,6 +17,8 @@ export interface ErrorResult {
 
 let prettyMode = false;
 let verboseMode = false;
+let jsonMode = false;
+let commandName = "";
 
 export function setPrettyMode(v: boolean): void {
   prettyMode = v;
@@ -23,6 +26,14 @@ export function setPrettyMode(v: boolean): void {
 
 export function setVerboseMode(v: boolean): void {
   verboseMode = v;
+}
+
+export function setJsonMode(v: boolean): void {
+  jsonMode = v;
+}
+
+export function setCommandName(name: string): void {
+  commandName = name;
 }
 
 export function isPretty(): boolean {
@@ -33,10 +44,21 @@ export function isVerbose(): boolean {
   return verboseMode;
 }
 
+function shouldOutputJson(): boolean {
+  if (jsonMode) return true;
+  if (prettyMode) return true;
+  return !process.stdout.isTTY;
+}
+
 export function success<T>(data: T): void {
-  const result: SuccessResult<T> = { ok: true, data };
-  const indent = prettyMode ? 2 : undefined;
-  process.stdout.write(JSON.stringify(result, null, indent) + "\n");
+  if (shouldOutputJson()) {
+    const result: SuccessResult<T> = { ok: true, data };
+    const indent = prettyMode ? 2 : undefined;
+    process.stdout.write(JSON.stringify(result, null, indent) + "\n");
+  } else {
+    const text = formatHuman(commandName, data);
+    process.stdout.write(text + "\n");
+  }
   process.exit(ExitCode.Success);
 }
 

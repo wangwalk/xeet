@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { setPrettyMode, setVerboseMode } from "./output.js";
+import { setPrettyMode, setVerboseMode, setJsonMode, setCommandName } from "./output.js";
 import { registerAuthCommands } from "./commands/auth.js";
 import { registerReadCommand } from "./commands/read.js";
 import { registerPostCommands } from "./commands/post.js";
@@ -15,12 +15,20 @@ program
   .name("xeet")
   .description("X Platform CLI for AI Agents")
   .version("0.1.0")
-  .option("--pretty", "Human-friendly formatted output")
+  .option("--pretty", "Human-friendly formatted output (indented JSON)")
+  .option("--json", "Force JSON output (default for non-TTY)")
   .option("--verbose", "Include request metadata")
   .hook("preAction", (_thisCommand, actionCommand) => {
     const opts = program.opts();
     if (opts.pretty) setPrettyMode(true);
+    if (opts.json) setJsonMode(true);
     if (opts.verbose) setVerboseMode(true);
+
+    // Derive command name for human-friendly formatting
+    const name = actionCommand.name();
+    const parent = actionCommand.parent;
+    const cmdName = parent && parent.name() !== "xeet" ? `${parent.name()}-${name}` : name;
+    setCommandName(cmdName);
   });
 
 registerAuthCommands(program);
