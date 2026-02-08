@@ -19,6 +19,7 @@ program
   .option("--pretty", "Human-friendly formatted output (indented JSON)")
   .option("--json", "Force JSON output (default for non-TTY)")
   .option("--verbose", "Include request metadata")
+  .option("--enable-commands <csv>", "Restrict available commands (comma-separated)")
   .hook("preAction", (_thisCommand, actionCommand) => {
     const opts = program.opts();
     if (opts.pretty) setPrettyMode(true);
@@ -41,5 +42,30 @@ registerUserCommand(program);
 registerInteractCommands(program);
 registerMentionsCommand(program);
 registerCompletionCommand(program);
+
+// Command sandbox: restrict available commands if --enable-commands or XEET_ENABLE_COMMANDS is set
+function getEnabledCommands(): string[] | null {
+  const envVal = process.env.XEET_ENABLE_COMMANDS;
+  if (envVal) return envVal.split(",").map((s) => s.trim()).filter(Boolean);
+
+  // Pre-scan argv for --enable-commands (before Commander parses)
+  const idx = process.argv.indexOf("--enable-commands");
+  if (idx !== -1 && process.argv[idx + 1]) {
+    return process.argv[idx + 1].split(",").map((s) => s.trim()).filter(Boolean);
+  }
+  return null;
+}
+
+const allowlist = getEnabledCommands();
+if (allowlist) {
+  // Always keep "completion" and "help" accessible
+  const keep = new Set([...allowlist, "completion", "help"]);
+  const cmds = program.commands;
+  for (let i = cmds.length - 1; i >= 0; i--) {
+    if (!keep.has(cmds[i].name())) {
+      cmds.splice(i, 1);
+    }
+  }
+}
 
 program.parse();
