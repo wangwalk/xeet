@@ -25,7 +25,11 @@ export function registerMentionsCommand(program: Command): void {
       try {
         const client = await getClient();
         const userId = await getAuthenticatedUserId();
-        const limit = parseInt(opts.limit) || 20;
+        let limit = parseInt(opts.limit) || 20;
+        if (limit < 5) {
+          process.stderr.write(`Note: --limit minimum is 5 for mentions (got ${limit}), using 5\n`);
+          limit = 5;
+        }
 
         let startTime: string | undefined;
         if (opts.since) {

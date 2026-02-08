@@ -23,7 +23,11 @@ export function registerSearchCommand(program: Command): void {
     .action(async (query: string, opts: { limit: string; sort: string }) => {
       try {
         const client = await getClient();
-        const limit = parseInt(opts.limit) || 20;
+        let limit = parseInt(opts.limit) || 20;
+        if (limit < 10) {
+          process.stderr.write(`Note: --limit minimum is 10 for search (got ${limit}), using 10\n`);
+          limit = 10;
+        }
 
         const res = await client.posts.searchRecent(query, {
           maxResults: Math.min(limit, 100),
