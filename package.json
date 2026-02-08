@@ -4,7 +4,7 @@
   "description": "X Platform CLI for AI Agents",
   "type": "module",
   "bin": {
-    "xeet": "./bin/xeet.js"
+    "xeet": "bin/xeet.js"
   },
   "scripts": {
     "build": "tsup",
@@ -23,7 +23,12 @@
     "agent",
     "ai"
   ],
+  "author": "wangwalk",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wangwalk/xeet.git"
+  },
   "engines": {
     "node": ">=18"
   },
