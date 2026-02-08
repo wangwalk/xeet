@@ -89,6 +89,21 @@ export async function getClient(): Promise<Client> {
   return cachedClient;
 }
 
+export async function getAccessToken(): Promise<string> {
+  // Ensure client is initialized and tokens are refreshed
+  await getClient();
+
+  if (!cachedCreds || cachedCreds.authType !== "oauth2") {
+    throw new XeetError(
+      ErrorCode.AUTH_INVALID,
+      "Media upload requires OAuth 2.0. Run: xeet auth login --client-id <id>",
+      ExitCode.AuthError,
+    );
+  }
+
+  return cachedCreds.accessToken;
+}
+
 export async function getAuthenticatedUserId(): Promise<string> {
   const client = await getClient();
   const me = await client.users.getMe();

@@ -14,6 +14,7 @@ const SCOPES = [
   "bookmark.read",
   "bookmark.write",
   "follows.read",
+  "media.write",
   "offline.access",
 ];
 

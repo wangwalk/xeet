@@ -1,15 +1,27 @@
 import { Command } from "commander";
-import { getClient } from "../client.js";
+import { getClient, getAccessToken } from "../client.js";
+import { uploadMedia } from "../utils/media.js";
 import { success, fail } from "../output.js";
+
+async function resolveMediaIds(mediaPath?: string): Promise<string[] | undefined> {
+  if (!mediaPath) return undefined;
+  const token = await getAccessToken();
+  const mediaId = await uploadMedia(token, mediaPath);
+  return [mediaId];
+}
 
 export function registerPostCommands(program: Command): void {
   program
     .command("post <text>")
     .description("Create a new post")
-    .action(async (text: string) => {
+    .option("--media <path>", "Attach an image (jpg/png/gif, max 5MB)")
+    .action(async (text: string, opts: { media?: string }) => {
       try {
         const client = await getClient();
-        const res = await client.posts.create({ text });
+        const mediaIds = await resolveMediaIds(opts.media);
+        const body: any = { text };
+        if (mediaIds) body.media = { media_ids: mediaIds };
+        const res = await client.posts.create(body);
         success(res.data);
       } catch (err) {
         fail(err);
@@ -19,13 +31,17 @@ export function registerPostCommands(program: Command): void {
   program
     .command("reply <id> <text>")
     .description("Reply to a post")
-    .action(async (id: string, text: string) => {
+    .option("--media <path>", "Attach an image (jpg/png/gif, max 5MB)")
+    .action(async (id: string, text: string, opts: { media?: string }) => {
       try {
         const client = await getClient();
-        const res = await client.posts.create({
+        const mediaIds = await resolveMediaIds(opts.media);
+        const body: any = {
           text,
-          reply: { in_reply_to_tweet_id: id } as any,
-        });
+          reply: { in_reply_to_tweet_id: id },
+        };
+        if (mediaIds) body.media = { media_ids: mediaIds };
+        const res = await client.posts.create(body);
         success(res.data);
       } catch (err) {
         fail(err);
@@ -35,13 +51,17 @@ export function registerPostCommands(program: Command): void {
   program
     .command("quote <id> <text>")
     .description("Quote a post")
-    .action(async (id: string, text: string) => {
+    .option("--media <path>", "Attach an image (jpg/png/gif, max 5MB)")
+    .action(async (id: string, text: string, opts: { media?: string }) => {
       try {
         const client = await getClient();
-        const res = await client.posts.create({
+        const mediaIds = await resolveMediaIds(opts.media);
+        const body: any = {
           text,
           quote_tweet_id: id,
-        } as any);
+        };
+        if (mediaIds) body.media = { media_ids: mediaIds };
+        const res = await client.posts.create(body);
         success(res.data);
       } catch (err) {
         fail(err);
