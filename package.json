@@ -1,0 +1,39 @@
+{
+  "name": "xeet",
+  "version": "0.1.0",
+  "description": "X Platform CLI for AI Agents",
+  "type": "module",
+  "bin": {
+    "xeet": "./bin/xeet.js"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist",
+    "bin"
+  ],
+  "keywords": [
+    "x",
+    "twitter",
+    "cli",
+    "agent",
+    "ai"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@xdevplatform/xdk": "^0.3.0",
+    "commander": "^13.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.1",
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.0"
+  }
+}
