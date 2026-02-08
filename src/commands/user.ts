@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { getClient } from "../client.js";
+import { getClient, getAuthenticatedUserId } from "../client.js";
 import { success, fail } from "../output.js";
 
 const USER_FIELDS = [
@@ -95,6 +95,60 @@ export function registerUserCommand(program: Command): void {
 
         success({
           users: res.data ?? [],
+          meta: res.meta ?? {},
+        });
+      } catch (err) {
+        fail(err);
+      }
+    });
+
+  program
+    .command("liked")
+    .description("Get posts liked by the authenticated user")
+    .option("--limit <n>", "Max number of results", "20")
+    .action(async (opts: { limit: string }) => {
+      try {
+        const client = await getClient();
+        const userId = await getAuthenticatedUserId();
+        const limit = parseInt(opts.limit) || 20;
+
+        const res = await client.users.getLikedPosts(userId, {
+          maxResults: Math.min(limit, 100),
+          tweetFields: ["id", "text", "author_id", "created_at", "public_metrics"],
+          expansions: ["author_id"],
+          userFields: ["id", "name", "username", "profile_image_url"],
+        });
+
+        success({
+          posts: res.data ?? [],
+          includes: res.includes ?? {},
+          meta: res.meta ?? {},
+        });
+      } catch (err) {
+        fail(err);
+      }
+    });
+
+  program
+    .command("bookmarks")
+    .description("Get posts bookmarked by the authenticated user")
+    .option("--limit <n>", "Max number of results", "20")
+    .action(async (opts: { limit: string }) => {
+      try {
+        const client = await getClient();
+        const userId = await getAuthenticatedUserId();
+        const limit = parseInt(opts.limit) || 20;
+
+        const res = await client.users.getBookmarks(userId, {
+          maxResults: Math.min(limit, 100),
+          tweetFields: ["id", "text", "author_id", "created_at", "public_metrics"],
+          expansions: ["author_id"],
+          userFields: ["id", "name", "username", "profile_image_url"],
+        });
+
+        success({
+          posts: res.data ?? [],
+          includes: res.includes ?? {},
           meta: res.meta ?? {},
         });
       } catch (err) {

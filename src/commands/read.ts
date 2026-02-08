@@ -44,4 +44,69 @@ export function registerReadCommand(program: Command): void {
         fail(err);
       }
     });
+
+  program
+    .command("lookup <ids...>")
+    .description("Get multiple posts by IDs (up to 100)")
+    .action(async (ids: string[]) => {
+      try {
+        const client = await getClient();
+        const res = await client.posts.getByIds(ids, {
+          tweetFields: [...TWEET_FIELDS],
+          expansions: ["author_id"],
+          userFields: [...USER_FIELDS],
+        });
+
+        success({
+          posts: res.data ?? [],
+          includes: res.includes ?? {},
+        });
+      } catch (err) {
+        fail(err);
+      }
+    });
+
+  program
+    .command("liking-users <id>")
+    .description("Get users who liked a post")
+    .option("--limit <n>", "Max number of results", "50")
+    .action(async (id: string, opts: { limit: string }) => {
+      try {
+        const client = await getClient();
+        const limit = parseInt(opts.limit) || 50;
+        const res = await client.posts.getLikingUsers(id, {
+          maxResults: Math.min(limit, 100),
+          userFields: ["id", "name", "username", "description", "public_metrics", "profile_image_url"],
+        });
+
+        success({
+          users: res.data ?? [],
+          meta: res.meta ?? {},
+        });
+      } catch (err) {
+        fail(err);
+      }
+    });
+
+  program
+    .command("reposted-by <id>")
+    .description("Get users who reposted a post")
+    .option("--limit <n>", "Max number of results", "50")
+    .action(async (id: string, opts: { limit: string }) => {
+      try {
+        const client = await getClient();
+        const limit = parseInt(opts.limit) || 50;
+        const res = await client.posts.getRepostedBy(id, {
+          maxResults: Math.min(limit, 100),
+          userFields: ["id", "name", "username", "description", "public_metrics", "profile_image_url"],
+        });
+
+        success({
+          users: res.data ?? [],
+          meta: res.meta ?? {},
+        });
+      } catch (err) {
+        fail(err);
+      }
+    });
 }
