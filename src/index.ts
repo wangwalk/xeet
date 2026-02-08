@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { setPrettyMode, setVerboseMode, setJsonMode, setCommandName } from "./output.js";
+import { setPrettyMode, setVerboseMode, setJsonMode, setCommandName, setNoInputMode } from "./output.js";
 import { registerAuthCommands } from "./commands/auth.js";
 import { registerReadCommand } from "./commands/read.js";
 import { registerPostCommands } from "./commands/post.js";
@@ -20,11 +20,13 @@ program
   .option("--json", "Force JSON output (default for non-TTY)")
   .option("--verbose", "Include request metadata")
   .option("--enable-commands <csv>", "Restrict available commands (comma-separated)")
+  .option("--no-input", "Never prompt; fail if interactive input is needed")
   .hook("preAction", (_thisCommand, actionCommand) => {
     const opts = program.opts();
     if (opts.pretty) setPrettyMode(true);
     if (opts.json) setJsonMode(true);
     if (opts.verbose) setVerboseMode(true);
+    if (opts.input === false) setNoInputMode(true);
 
     // Derive command name for human-friendly formatting
     const name = actionCommand.name();

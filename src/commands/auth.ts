@@ -11,7 +11,8 @@ import {
 } from "../utils/config.js";
 import { getClient } from "../client.js";
 import { startPkceLogin } from "../utils/oauth2.js";
-import { success, fail } from "../output.js";
+import { success, fail, isNoInput } from "../output.js";
+import { XeetError, ErrorCode, ExitCode } from "../utils/errors.js";
 
 function ask(rl: readline.Interface, q: string): Promise<string> {
   return new Promise((resolve) => rl.question(q, resolve));
@@ -77,6 +78,12 @@ export function registerAuthCommands(program: Command): void {
     .description("Configure OAuth 1.0a credentials interactively")
     .action(async () => {
       try {
+        if (isNoInput()) {
+          fail(new XeetError(ErrorCode.INVALID_ARGS,
+            "auth setup requires interactive input, but --no-input is set. Use environment variables instead.",
+            ExitCode.InvalidArgs));
+        }
+
         const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 
         process.stdout.write("Enter your X API credentials (from https://developer.x.com)\n\n");

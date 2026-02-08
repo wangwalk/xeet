@@ -19,6 +19,7 @@ let prettyMode = false;
 let verboseMode = false;
 let jsonMode = false;
 let commandName = "";
+let noInputMode = false;
 
 export function setPrettyMode(v: boolean): void {
   prettyMode = v;
@@ -34,6 +35,14 @@ export function setJsonMode(v: boolean): void {
 
 export function setCommandName(name: string): void {
   commandName = name;
+}
+
+export function setNoInputMode(v: boolean): void {
+  noInputMode = v;
+}
+
+export function isNoInput(): boolean {
+  return noInputMode || process.env.XEET_NO_INPUT === "1";
 }
 
 export function isPretty(): boolean {
