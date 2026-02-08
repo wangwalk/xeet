@@ -1,6 +1,6 @@
 # xeet — X (Twitter) in your terminal.
 
-Fast, agent-friendly CLI for the X platform. JSON-first output, OAuth 2.0 PKCE auth, and zero runtime dependencies beyond Node.js.
+Fast, agent-friendly CLI for the X platform. JSON-first output, OAuth 2.0 PKCE auth, minimal dependencies.
 
 ## Features
 
@@ -17,6 +17,16 @@ Fast, agent-friendly CLI for the X platform. JSON-first output, OAuth 2.0 PKCE a
 
 ## Installation
 
+```bash
+npm install -g xeet
+```
+
+Or run directly without installing:
+
+```bash
+npx xeet --help
+```
+
 ### From source
 
 ```bash
@@ -24,19 +34,7 @@ git clone https://github.com/wangwalk/xeet.git
 cd xeet
 npm install
 npm run build
-```
-
-Run:
-
-```bash
-node bin/xeet.js --help
-```
-
-Or link globally:
-
-```bash
 npm link
-xeet --help
 ```
 
 ## Quick Start
@@ -123,12 +121,17 @@ Shows auth type, credential source, user info, and for OAuth 2.0: token expiry a
 
 ```bash
 xeet post "Hello world"                  # Create a post
+xeet post "Check this out" --media a.jpg # Post with image
 xeet reply <id> "Nice post!"             # Reply to a post
+xeet reply <id> "Look" --media b.png     # Reply with image
 xeet quote <id> "Check this out"         # Quote a post
+xeet quote <id> "Wow" --media c.gif      # Quote with image
 xeet thread "First" "Second" "Third"     # Post a thread
 xeet delete <id>                         # Delete a post
 xeet read <id>                           # Get a post by ID
 ```
+
+`--media` supports jpg, png, gif, webp (max 5MB). Requires OAuth 2.0 with `media.write` scope.
 
 ### Timeline
 
@@ -237,7 +240,7 @@ npm run dev            # Watch mode
 - **TypeScript** + **tsup** (ESM, Node 18+)
 - **Commander.js** for CLI parsing
 - **@xdevplatform/xdk** for X API client
-- Zero runtime dependencies beyond the above
+- Minimal runtime dependencies (just the above two)
 
 ## License
 
