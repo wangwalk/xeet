@@ -44,4 +44,46 @@ export function registerInteractCommands(program: Command): void {
         fail(err);
       }
     });
+
+  program
+    .command("unlike <id>")
+    .description("Unlike a post")
+    .action(async (id: string) => {
+      try {
+        const client = await getClient();
+        const userId = await getAuthenticatedUserId();
+        const res = await client.users.unlikePost(userId, id);
+        success({ unliked: res.data?.liked === false, id });
+      } catch (err) {
+        fail(err);
+      }
+    });
+
+  program
+    .command("unrepost <id>")
+    .description("Undo a repost (unretweet)")
+    .action(async (id: string) => {
+      try {
+        const client = await getClient();
+        const userId = await getAuthenticatedUserId();
+        const res = await client.users.unrepostPost(userId, id);
+        success({ unreposted: res.data?.retweeted === false, id });
+      } catch (err) {
+        fail(err);
+      }
+    });
+
+  program
+    .command("unbookmark <id>")
+    .description("Remove a bookmark")
+    .action(async (id: string) => {
+      try {
+        const client = await getClient();
+        const userId = await getAuthenticatedUserId();
+        const res = await client.users.deleteBookmark(userId, id);
+        success({ unbookmarked: res.data?.bookmarked === false, id });
+      } catch (err) {
+        fail(err);
+      }
+    });
 }
