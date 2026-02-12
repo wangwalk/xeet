@@ -48,38 +48,6 @@ export function registerSearchCommand(program: Command): void {
     });
 
   program
-    .command("search-all <query>")
-    .description("Search all posts (full archive, requires Academic/Enterprise)")
-    .option("--limit <n>", "Max number of results", "20")
-    .option("--sort <order>", "Sort order: recency or relevancy", "recency")
-    .action(async (query: string, opts: { limit: string; sort: string }) => {
-      try {
-        const client = await getClient();
-        let limit = parseInt(opts.limit) || 20;
-        if (limit < 10) {
-          process.stderr.write(`Note: --limit minimum is 10 for search-all (got ${limit}), using 10\n`);
-          limit = 10;
-        }
-
-        const res = await client.posts.searchAll(query, {
-          maxResults: Math.min(limit, 500),
-          tweetFields: [...TWEET_FIELDS],
-          expansions: ["author_id"],
-          userFields: [...USER_FIELDS],
-          sortOrder: opts.sort as "recency" | "relevancy",
-        });
-
-        success({
-          posts: res.data ?? [],
-          includes: res.includes ?? {},
-          meta: res.meta ?? {},
-        });
-      } catch (err) {
-        fail(err);
-      }
-    });
-
-  program
     .command("counts <query>")
     .description("Get post counts matching a search query (last 7 days)")
     .option("--granularity <g>", "Time granularity: minute, hour, or day", "hour")
@@ -87,26 +55,6 @@ export function registerSearchCommand(program: Command): void {
       try {
         const client = await getClient();
         const res = await client.posts.getCountsRecent(query, {
-          granularity: opts.granularity as any,
-        });
-
-        success({
-          counts: res.data ?? [],
-          meta: res.meta ?? {},
-        });
-      } catch (err) {
-        fail(err);
-      }
-    });
-
-  program
-    .command("counts-all <query>")
-    .description("Get post counts from full archive (requires Academic/Enterprise)")
-    .option("--granularity <g>", "Time granularity: minute, hour, or day", "day")
-    .action(async (query: string, opts: { granularity: string }) => {
-      try {
-        const client = await getClient();
-        const res = await client.posts.getCountsAll(query, {
           granularity: opts.granularity as any,
         });
 
