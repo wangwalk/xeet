@@ -155,4 +155,27 @@ export function registerUserCommand(program: Command): void {
         fail(err);
       }
     });
+
+  program
+    .command("usearch <query>")
+    .description("Search for users by query")
+    .option("--limit <n>", "Max number of results", "20")
+    .action(async (query: string, opts: { limit: string }) => {
+      try {
+        const client = await getClient();
+        const limit = parseInt(opts.limit) || 20;
+
+        const res = await client.users.search(query, {
+          maxResults: Math.min(limit, 100),
+          userFields: ["id", "name", "username", "description", "public_metrics", "profile_image_url"],
+        });
+
+        success({
+          users: res.data ?? [],
+          meta: res.meta ?? {},
+        });
+      } catch (err) {
+        fail(err);
+      }
+    });
 }

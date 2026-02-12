@@ -86,4 +86,88 @@ export function registerInteractCommands(program: Command): void {
         fail(err);
       }
     });
+
+  program
+    .command("follow <username>")
+    .description("Follow a user")
+    .action(async (username: string) => {
+      try {
+        const client = await getClient();
+        const myUserId = await getAuthenticatedUserId();
+        const name = username.replace(/^@/, "");
+
+        const userRes = await client.users.getByUsername(name);
+        if (!userRes.data?.id) {
+          fail({ code: "NOT_FOUND", message: `User @${name} not found` });
+        }
+
+        const res = await client.users.followUser(myUserId, { body: { target_user_id: userRes.data!.id } } as any);
+        success({ followed: res.data?.following ?? true, username: name });
+      } catch (err) {
+        fail(err);
+      }
+    });
+
+  program
+    .command("unfollow <username>")
+    .description("Unfollow a user")
+    .action(async (username: string) => {
+      try {
+        const client = await getClient();
+        const myUserId = await getAuthenticatedUserId();
+        const name = username.replace(/^@/, "");
+
+        const userRes = await client.users.getByUsername(name);
+        if (!userRes.data?.id) {
+          fail({ code: "NOT_FOUND", message: `User @${name} not found` });
+        }
+
+        const res = await client.users.unfollowUser(myUserId, userRes.data!.id);
+        success({ unfollowed: res.data?.following === false, username: name });
+      } catch (err) {
+        fail(err);
+      }
+    });
+
+  program
+    .command("mute <username>")
+    .description("Mute a user")
+    .action(async (username: string) => {
+      try {
+        const client = await getClient();
+        const myUserId = await getAuthenticatedUserId();
+        const name = username.replace(/^@/, "");
+
+        const userRes = await client.users.getByUsername(name);
+        if (!userRes.data?.id) {
+          fail({ code: "NOT_FOUND", message: `User @${name} not found` });
+        }
+
+        const res = await client.users.muteUser(myUserId, { body: { target_user_id: userRes.data!.id } } as any);
+        success({ muted: res.data?.muting ?? true, username: name });
+      } catch (err) {
+        fail(err);
+      }
+    });
+
+  program
+    .command("unmute <username>")
+    .description("Unmute a user")
+    .action(async (username: string) => {
+      try {
+        const client = await getClient();
+        const myUserId = await getAuthenticatedUserId();
+        const name = username.replace(/^@/, "");
+
+        const userRes = await client.users.getByUsername(name);
+        if (!userRes.data?.id) {
+          fail({ code: "NOT_FOUND", message: `User @${name} not found` });
+        }
+
+        const res = await client.users.unmuteUser(myUserId, userRes.data!.id);
+        success({ unmuted: res.data?.muting === false, username: name });
+      } catch (err) {
+        fail(err);
+      }
+    });
 }

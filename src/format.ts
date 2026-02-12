@@ -152,6 +152,19 @@ function formatAuthStatus(data: any): string {
   return lines.join("\n");
 }
 
+function formatDmEvents(data: any): string {
+  const events: any[] = data.events ?? [];
+  if (!events.length) return "(no messages)";
+  return events
+    .map((e: any) => {
+      const time = e.createdAt ? timeAgo(e.createdAt) : "";
+      const sender = e.senderId || "";
+      const text = truncate(e.text || "", 60);
+      return `${padEnd(sender, 20)}  ${padEnd(text, 60)}  ${time}`;
+    })
+    .join("\n");
+}
+
 const formatters: Record<string, (data: any) => string> = {
   post: (d) => `Posted: ${d?.id ?? ""}\n${d?.text ?? ""}`,
   reply: (d) => `Posted: ${d?.id ?? ""}\n${d?.text ?? ""}`,
@@ -181,6 +194,15 @@ const formatters: Record<string, (data: any) => string> = {
   unrepost: (d) => formatSimpleAction("Unreposted", d),
   bookmark: (d) => formatSimpleAction("Bookmarked", d),
   unbookmark: (d) => formatSimpleAction("Unbookmarked", d),
+  follow: (d) => formatSimpleAction("Followed", { id: `@${d.username}` }),
+  unfollow: (d) => formatSimpleAction("Unfollowed", { id: `@${d.username}` }),
+  mute: (d) => formatSimpleAction("Muted", { id: `@${d.username}` }),
+  unmute: (d) => formatSimpleAction("Unmuted", { id: `@${d.username}` }),
+  usearch: formatUserList,
+  "dm-send": (d) => "Message sent",
+  "dm-reply": (d) => "Message sent",
+  "dm-inbox": formatDmEvents,
+  "dm-conversation": formatDmEvents,
   "auth-login": formatAuthLogin,
   "auth-setup": formatAuthSetup,
   "auth-status": formatAuthStatus,

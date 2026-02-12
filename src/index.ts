@@ -8,6 +8,7 @@ import { registerSearchCommand } from "./commands/search.js";
 import { registerUserCommand } from "./commands/user.js";
 import { registerInteractCommands } from "./commands/interact.js";
 import { registerMentionsCommand } from "./commands/mentions.js";
+import { registerDmCommands } from "./commands/dm.js";
 import { registerCompletionCommand } from "./commands/completion.js";
 
 const program = new Command();
@@ -43,6 +44,7 @@ registerSearchCommand(program);
 registerUserCommand(program);
 registerInteractCommands(program);
 registerMentionsCommand(program);
+registerDmCommands(program);
 registerCompletionCommand(program);
 
 // Command sandbox: restrict available commands if --enable-commands or XEET_ENABLE_COMMANDS is set
